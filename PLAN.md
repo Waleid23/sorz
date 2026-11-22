@@ -84,7 +84,7 @@ People with a lot of subscriptions spread across streaming, gaming, food deliver
 Each item is meant to be a small, testable piece (roughly one sitting).
 
 ### Week 6: Scaffold
-- [ ] Create a Next.js + TypeScript + Tailwind app; set up ESLint and Prettier
+- [x] Create a Next.js + TypeScript + Tailwind app; set up ESLint and Prettier
 - [ ] Create the Supabase project; add env vars to `.env.local` and Vercel
 - [ ] Deploy "hello world" to Vercel (deploy on day one)
 - [ ] App shell for phones: header, bottom nav (Home, Subs, Calendar, Shared, Settings), placeholder pages
