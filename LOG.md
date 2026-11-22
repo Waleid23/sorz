@@ -1,6 +1,8 @@
 # Sorz — Dev Log
 
-## 2026-11-14: Planning
+Weeks are counted as the five-week moonshot. Week 1 was planning; week 2 was project setup. PLAN.md's "Week 6"–"Week 9" task lists are worked through in order from here, not tied to a specific moonshot week.
+
+## 2026-11-14: Planning (week 1 of 5)
 
 **Done**
 - Defined the project: Sorz, a phone-first subscription and free-trial tracker with spending totals, renewal reminders, and shared-plan splitting.
@@ -22,7 +24,7 @@
 **Next**
 - Week 6: scaffold the Next.js app, create the Supabase project, deploy to Vercel on day one, write the schema and RLS migrations, and add the cost-normalization helper with tests.
 
-## 2026-11-21: Week 6 scaffold
+## 2026-11-21: Scaffold (week 2 of 5)
 
 **Done**
 - Scaffolded Next.js 16.4.6 (App Router, TypeScript, Tailwind v4, ESLint, `src/` directory, `@/*` import alias) into the repo root. It was generated in a temp folder and moved in so PLAN.md, CLAUDE.md, LOG.md, and README.md stayed untouched.
@@ -38,7 +40,7 @@
 **Next**
 - Create the Supabase project and env vars, then deploy to Vercel.
 
-## 2026-11-21: Rename to Sorz
+## 2026-11-21: Rename to Sorz (week 2 of 5)
 
 **Done**
 - Renamed the project from SubTrack to Sorz. The GitHub repo is now github.com/Waleid23/sorz, and the local git remote points to it.
@@ -48,7 +50,7 @@
 - Rename the local project folder (done by hand).
 - Create the Supabase project and env vars, then deploy to Vercel.
 
-## 2026-11-21: Week 7, Step 2: connect Supabase
+## 2026-11-21: Connect Supabase (week 2 of 5)
 
 **Done**
 - Installed `@supabase/supabase-js` (2.119.2) and `@supabase/ssr` (0.12.7).
@@ -67,7 +69,7 @@
 - Fill in `.env.local`, then add the same two vars in Vercel.
 - Login/sign-up pages, then route protection in the proxy.
 
-## 2026-11-21: Env vars and first Vercel deploy
+## 2026-11-21: Env vars and first Vercel deploy (week 2 of 5)
 
 **Done**
 - Filled in `.env.local` with the Supabase project URL and publishable key; checked the format and confirmed the Supabase auth API accepts the key (HTTP 200).
@@ -81,3 +83,18 @@
 **Next**
 - Database schema as SQL migrations, with RLS on every table.
 - Phone app shell, seed data, and `toMonthly` / `toYearly` with Vitest tests.
+
+## 2026-11-21: Week 2 of 5 wrap-up
+
+**Done this week**
+- Scaffolded the Next.js app (TypeScript, Tailwind, ESLint, Prettier).
+- Renamed the project to Sorz.
+- Connected Supabase: client helpers, session-refresh proxy, `.env.local` and `.env.example`.
+- Added the env vars in Vercel and deployed: https://sorz-eight.vercel.app
+
+Week 2 is done. The goal was to get the project set up, and it is.
+
+**Next (week 3)**
+- Database schema with RLS on every table.
+- Phone app shell, seed data, and `toMonthly` / `toYearly` with tests.
+- Then login and the subscription form.
