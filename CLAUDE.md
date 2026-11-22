@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project
-SubTrack is a phone-first subscription tracker web app (Artifact 5 moonshot, a five-week solo project). Users track subscriptions and free trials, see monthly and yearly spending, get renewal reminders, and manage shared plans they split with friends.
+Sorz is a phone-first subscription tracker web app (Artifact 5 moonshot, a five-week solo project). Users track subscriptions and free trials, see monthly and yearly spending, get renewal reminders, and manage shared plans they split with friends.
 
 **Read [PLAN.md](PLAN.md) first.** It has the user research, requirements, data model, and the week-by-week task list. Update the checkboxes there as tasks are finished.
 **Add an entry to [LOG.md](LOG.md)** at the end of each work session (date, what was done, decisions, next steps).

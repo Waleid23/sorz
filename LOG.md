@@ -1,9 +1,9 @@
-# SubTrack — Dev Log
+# Sorz — Dev Log
 
 ## 2026-11-14: Planning
 
 **Done**
-- Defined the project: SubTrack, a phone-first subscription and free-trial tracker with spending totals, renewal reminders, and shared-plan splitting.
+- Defined the project: Sorz, a phone-first subscription and free-trial tracker with spending totals, renewal reminders, and shared-plan splitting.
 - Wrote down feedback from two potential users (see PLAN.md) and turned it into requirements:
   - phone-first design
   - monthly, yearly, and seasonal billing (NBA League Pass)
@@ -36,4 +36,14 @@
 - No Supabase yet.
 
 **Next**
+- Create the Supabase project and env vars, then deploy to Vercel.
+
+## 2026-11-21: Rename to Sorz
+
+**Done**
+- Renamed the project from SubTrack to Sorz. The GitHub repo is now github.com/Waleid23/sorz, and the local git remote points to it.
+- Updated the name in package.json, package-lock.json, README.md, PLAN.md, CLAUDE.md, this log, and the app's page title and description metadata (replacing the create-next-app placeholder text).
+
+**Next**
+- Rename the local project folder (done by hand).
 - Create the Supabase project and env vars, then deploy to Vercel.

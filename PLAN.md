@@ -1,10 +1,10 @@
-# SubTrack — Project Plan
+# Sorz — Project Plan
 
 Artifact 5 moonshot · solo · five weeks (Weeks 6–9 for core work, plus stretch time)
 
 ## The idea
 
-SubTrack is a phone-first web app for keeping track of subscriptions and free trials. Users can:
+Sorz is a phone-first web app for keeping track of subscriptions and free trials. Users can:
 
 - See every subscription in one place, grouped by category
 - See what they spend per month and per year
