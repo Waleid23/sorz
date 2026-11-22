@@ -47,3 +47,22 @@
 **Next**
 - Rename the local project folder (done by hand).
 - Create the Supabase project and env vars, then deploy to Vercel.
+
+## 2026-11-21: Week 7, Step 2: connect Supabase
+
+**Done**
+- Installed `@supabase/supabase-js` (2.119.2) and `@supabase/ssr` (0.12.7).
+- Added `.env.local` with blank `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (filled in by hand, never pasted into chat) and a committed `.env.example` with the same names. `.env.local` is gitignored; added `!.env.example` so the template can be committed.
+- Supabase helpers: `src/lib/supabase/client.ts` (browser), `src/lib/supabase/server.ts` (Server Components, Server Actions, Route Handlers), and `src/lib/supabase/proxy.ts` (`updateSession`).
+- `src/proxy.ts` (Next.js 16's replacement for `middleware.ts`) calls `updateSession` on every non-static request to keep the login session fresh.
+- Lint, format check, typecheck, and build pass; the dev server serves `/` with the env values still blank.
+
+**Decisions**
+- Used the new publishable key, not the legacy anon key. The service-role/secret key is not used anywhere yet.
+- The proxy uses `supabase.auth.getClaims()` (verifies the JWT) rather than `getSession()`, and forwards the cache-control headers `@supabase/ssr` provides so CDNs don't cache auth cookies.
+- The proxy skips Supabase when the env vars are empty, so the app still runs before they're filled in.
+- No login redirect yet; that's the "protect routes" task later in Week 7.
+
+**Next**
+- Fill in `.env.local`, then add the same two vars in Vercel.
+- Login/sign-up pages, then route protection in the proxy.
