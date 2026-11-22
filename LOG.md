@@ -66,3 +66,18 @@
 **Next**
 - Fill in `.env.local`, then add the same two vars in Vercel.
 - Login/sign-up pages, then route protection in the proxy.
+
+## 2026-11-21: Env vars and first Vercel deploy
+
+**Done**
+- Filled in `.env.local` with the Supabase project URL and publishable key; checked the format and confirmed the Supabase auth API accepts the key (HTTP 200).
+- Imported the GitHub repo into Vercel, added `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the project's environment variables, and redeployed.
+- Live at https://sorz-eight.vercel.app (returns 200 with the "Sorz" title).
+- Ticked the Week 6 "Supabase project + env vars" and "Deploy to Vercel" tasks in PLAN.md.
+
+**Decisions**
+- Skipped Vercel's optional Supabase integration: the Supabase project already exists, and the integration would add its own env vars (possibly including the service-role key) that the app doesn't use.
+
+**Next**
+- Database schema as SQL migrations, with RLS on every table.
+- Phone app shell, seed data, and `toMonthly` / `toYearly` with Vitest tests.

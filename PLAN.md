@@ -85,8 +85,8 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 
 ### Week 6: Scaffold
 - [x] Create a Next.js + TypeScript + Tailwind app; set up ESLint and Prettier
-- [ ] Create the Supabase project; add env vars to `.env.local` and Vercel
-- [ ] Deploy "hello world" to Vercel (deploy on day one)
+- [x] Create the Supabase project; add env vars to `.env.local` and Vercel
+- [x] Deploy "hello world" to Vercel (deploy on day one)
 - [ ] App shell for phones: header, bottom nav (Home, Subs, Calendar, Shared, Settings), placeholder pages
 - [ ] Write the database schema as SQL migrations (tables above) and commit them
 - [ ] Turn on RLS for every table, with owner-only policies
