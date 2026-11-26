@@ -202,3 +202,16 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Create a profile row when a user signs up.
+
+## 2026-11-26: Profile row on sign-up (week 3 of 5)
+
+**Done**
+- Migration `20261126010000_create_profile_on_signup.sql`: an `after insert` trigger on `auth.users` calls `public.handle_new_user()`, which inserts a `profiles` row (defaults: USD, 3 reminder days, no display name). It also backfills profiles for existing accounts without overwriting the seeded display names.
+- Tested in PGlite (7 checks, including that removing the trigger makes the sign-up check fail), then applied in the Supabase SQL Editor. Adding `person3@sorz.test` in the dashboard created its profile row.
+
+**Decisions**
+- The function is `security definer` (a brand-new user has no session, so RLS would block the insert) with an empty `search_path` and schema-qualified names, and `execute` is revoked from `anon` / `authenticated` so it can't be called as an API.
+- `display_name` starts empty (NULL) rather than being guessed from the email; the app can fall back to the email and let users set a name in Settings.
+
+**Next**
+- "Add subscription" form: name, price, cycle, next billing date, category.
