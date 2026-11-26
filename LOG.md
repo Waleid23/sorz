@@ -266,3 +266,22 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Free-trial toggle with a trial end date.
+
+## 2026-11-26: Free-trial toggle (week 3 of 5)
+
+**Done**
+- Moved the project out of iCloud's Desktop folder to `~/Projects/sorz`, so no more " 2" duplicate files. Git, `.env.local`, and all tests came across fine. Updated the Status section in CLAUDE.md, which still said sign-up was next.
+- The add form has a "Free trial" switch (a checkbox with `role="switch"`, the whole 58px row is tappable). Turning it on replaces "Next billing date" with "Trial ends" and adds "What you'll pay once the trial ends." under the price.
+- Schema: `is_trial` comes from the checkbox; a trial needs an end date, which is also saved as `next_billing_date` (the first charge), the same way the seeded Game Pass trial is stored. Non-trials save `trial_end_date` as null. Missing-date errors show alongside other errors on the first try. Impossible dates now say "Choose a real date." instead of "Choose the next billing date." 8 new tests (63 total), including Feb 29 in leap and non-leap years and a seasonal trial.
+- Tested with Playwright (Chrome, 375px, light and dark) as person1: the fields swap with the switch, price and end-date errors show together, the switch, cycle, and name survive an error, and a yearly trial saves with `is_trial = true` and `trial_end_date = next_billing_date = 2026-12-10`. The list shows the Trial badge and "Trial ends Dec 10". Test row deleted.
+
+**Decisions**
+- One date for trials instead of two: the first charge is the day the trial ends, so asking for both would invite mismatches.
+- Trial end dates in the past are allowed (same 2000–2100 range as other dates), so an old trial can be entered after the fact. Week 8's trial actions handle converting or cancelling.
+- Trials still count toward category subtotals at their after-trial price. Whether a trial should count before it converts is left for the Week 8 dashboard and trials work.
+
+**Noticed**
+- In dark mode, the native date picker's calendar icon is dark on a dark background (both date fields, not new). A `color-scheme: dark` on the inputs would fix it during polish.
+
+**Next**
+- Edit and delete a subscription; mark it as cancelled or paused.

@@ -99,7 +99,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Create a profile row when a user signs up
 - [x] "Add subscription" form: name, price, cycle, next billing date, category
 - [x] Seasonal fields appear only when "seasonal" is selected
-- [ ] Free trial toggle with a trial end date
+- [x] Free trial toggle with a trial end date
 - [x] Subscription list grouped by category, with category icons/colors
 - [ ] Edit and delete a subscription; mark it as cancelled or paused
 - [ ] "Duplicate" action and an optional label field (multiple Twitch subs)

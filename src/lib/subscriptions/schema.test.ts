@@ -52,6 +52,8 @@ describe("newSubscriptionSchema", () => {
       price: 15.49,
       season_start_month: null,
       season_end_month: null,
+      is_trial: false,
+      trial_end_date: null,
     });
   });
 
@@ -88,7 +90,7 @@ describe("newSubscriptionSchema", () => {
     expect(
       errorsFor({ ...valid, next_billing_date: "2027-02-29" })
         .next_billing_date,
-    ).toEqual(["Choose the next billing date."]);
+    ).toEqual(["Choose a real date."]);
     expect(
       errorsFor({ ...valid, next_billing_date: "2026-04-31" })
         .next_billing_date,
@@ -204,5 +206,89 @@ describe("seasonal plans", () => {
     });
     expect(result.season_start_month).toBeNull();
     expect(result.season_end_month).toBeNull();
+  });
+});
+
+describe("free trials", () => {
+  const trial = {
+    ...valid,
+    name: "Xbox Game Pass",
+    category: "gaming",
+    next_billing_date: "",
+    is_trial: "on",
+    trial_end_date: "2026-12-10",
+  };
+
+  it("uses the trial end date as the first billing date", () => {
+    const result = newSubscriptionSchema.parse(trial);
+    expect(result.is_trial).toBe(true);
+    expect(result.trial_end_date).toBe("2026-12-10");
+    expect(result.next_billing_date).toBe("2026-12-10");
+  });
+
+  it("ignores a leftover next billing date on a trial", () => {
+    const result = newSubscriptionSchema.parse({
+      ...trial,
+      next_billing_date: "2027-03-01",
+    });
+    expect(result.next_billing_date).toBe("2026-12-10");
+  });
+
+  it("requires the trial end date, but not the next billing date", () => {
+    expect(errorsFor({ ...trial, trial_end_date: "" })).toEqual({
+      trial_end_date: ["Choose the day the trial ends."],
+    });
+    expect(errorsFor({ ...trial, trial_end_date: undefined })).toEqual({
+      trial_end_date: ["Choose the day the trial ends."],
+    });
+  });
+
+  it("rejects impossible trial end dates, including Feb 29 outside leap years", () => {
+    expect(errorsFor({ ...trial, trial_end_date: "2028-02-29" })).toEqual({});
+    expect(
+      errorsFor({ ...trial, trial_end_date: "2027-02-29" }).trial_end_date,
+    ).toEqual(["Choose a real date."]);
+    expect(
+      errorsFor({ ...trial, trial_end_date: "2026-11-31" }).trial_end_date,
+    ).toEqual(["Choose a real date."]);
+  });
+
+  it("reports a missing end date together with other errors", () => {
+    const errors = errorsFor({ ...trial, price: "abc", trial_end_date: "" });
+    expect(errors.price).toBeDefined();
+    expect(errors.trial_end_date).toEqual(["Choose the day the trial ends."]);
+  });
+
+  it("is off unless the box is checked, and then drops the end date", () => {
+    const result = newSubscriptionSchema.parse({
+      ...valid,
+      trial_end_date: "2026-12-10",
+    });
+    expect(result.is_trial).toBe(false);
+    expect(result.trial_end_date).toBeNull();
+    expect(result.next_billing_date).toBe(valid.next_billing_date);
+  });
+
+  it("still requires the next billing date when it isn't a trial", () => {
+    expect(errorsFor({ ...valid, next_billing_date: "" })).toEqual({
+      next_billing_date: ["Choose the next billing date."],
+    });
+  });
+
+  it("works with seasonal plans", () => {
+    const result = newSubscriptionSchema.parse({
+      ...trial,
+      name: "NBA League Pass",
+      category: "sports",
+      billing_cycle: "seasonal",
+      season_start_month: "10",
+      season_end_month: "6",
+    });
+    expect(result).toMatchObject({
+      is_trial: true,
+      next_billing_date: "2026-12-10",
+      season_start_month: 10,
+      season_end_month: 6,
+    });
   });
 });

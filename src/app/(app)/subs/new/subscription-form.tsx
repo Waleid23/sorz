@@ -73,6 +73,7 @@ export function SubscriptionForm() {
   // Controlled so the season fields can appear and disappear as it changes.
   const [cycle, setCycle] = useState<string>(values.billing_cycle || "monthly");
   const seasonal = cycle === "seasonal";
+  const [trial, setTrial] = useState(values.is_trial === "on");
 
   // React resets a form after its `action` runs, which would snap the
   // controlled billing-cycle radios back to their first value while the
@@ -109,7 +110,14 @@ export function SubscriptionForm() {
       <Field
         name="price"
         label={seasonal ? "Price for the season" : "Price"}
-        hint={seasonal ? "The total you pay for the whole season." : undefined}
+        hint={
+          [
+            seasonal && "The total you pay for the whole season.",
+            trial && "What you'll pay once the trial ends.",
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
         error={errors.price}
       >
         <div className="relative">
@@ -187,21 +195,62 @@ export function SubscriptionForm() {
         </div>
       )}
 
-      <Field
-        name="next_billing_date"
-        label="Next billing date"
-        hint={seasonal ? "When you're next charged for a season." : undefined}
-        error={errors.next_billing_date}
-      >
+      <label className="flex min-h-12 cursor-pointer items-center justify-between gap-4 rounded-xl border border-zinc-300 px-3 py-2 dark:border-zinc-700">
+        <span className="flex flex-col">
+          <span className="text-base font-medium">Free trial</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            Not charged until the trial ends
+          </span>
+        </span>
         <input
-          id="next_billing_date"
-          name="next_billing_date"
-          type="date"
-          defaultValue={values.next_billing_date}
-          className={`${inputClass} appearance-none`}
-          {...errorProps("next_billing_date", errors.next_billing_date)}
+          type="checkbox"
+          role="switch"
+          name="is_trial"
+          checked={trial}
+          onChange={(e) => setTrial(e.target.checked)}
+          className="peer sr-only"
         />
-      </Field>
+        <span
+          aria-hidden="true"
+          className="relative h-7 w-12 shrink-0 rounded-full bg-zinc-300 transition-colors peer-checked:bg-indigo-600 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5 dark:bg-zinc-700 dark:peer-checked:bg-indigo-500"
+        />
+      </label>
+
+      {/* A trial's first charge is the day it ends, so only one date is asked
+          for. Only the visible date is rendered (and submitted). */}
+      {trial ? (
+        <Field
+          name="trial_end_date"
+          label="Trial ends"
+          hint="You'll be charged for the first time on this day."
+          error={errors.trial_end_date}
+        >
+          <input
+            id="trial_end_date"
+            name="trial_end_date"
+            type="date"
+            defaultValue={values.trial_end_date}
+            className={`${inputClass} appearance-none`}
+            {...errorProps("trial_end_date", errors.trial_end_date)}
+          />
+        </Field>
+      ) : (
+        <Field
+          name="next_billing_date"
+          label="Next billing date"
+          hint={seasonal ? "When you're next charged for a season." : undefined}
+          error={errors.next_billing_date}
+        >
+          <input
+            id="next_billing_date"
+            name="next_billing_date"
+            type="date"
+            defaultValue={values.next_billing_date}
+            className={`${inputClass} appearance-none`}
+            {...errorProps("next_billing_date", errors.next_billing_date)}
+          />
+        </Field>
+      )}
 
       <Field name="category" label="Category" error={errors.category}>
         <select

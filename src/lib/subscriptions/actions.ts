@@ -21,6 +21,8 @@ const FIELDS: NewSubscriptionField[] = [
   "category",
   "season_start_month",
   "season_end_month",
+  "is_trial",
+  "trial_end_date",
 ];
 
 export async function addSubscription(
