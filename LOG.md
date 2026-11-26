@@ -98,3 +98,23 @@ Week 2 is done. The goal was to get the project set up, and it is.
 - Database schema with RLS on every table.
 - Phone app shell, seed data, and `toMonthly` / `toYearly` with tests.
 - Then login and the subscription form.
+
+## 2026-11-26: Database schema and RLS (week 3 of 5)
+
+**Done**
+- Added `supabase/migrations/20261126000000_initial_schema.sql`: `profiles`, `subscriptions`, `shared_plans`, `plan_members`, `reminders_sent`, following PLAN.md's data model.
+- RLS is enabled on every table in the same migration, with owner-only policies. `plan_members` and `reminders_sent` check ownership through their parent row; `shared_plans` checks that you own both the plan and its subscription.
+- Tested the migration in PGlite (in-memory Postgres) with stubbed `auth.users` / `auth.uid()`: 34 checks covering cross-user reads and writes, anonymous access, check constraints, the one-reminder-per-day rule, and cascade deletes. All pass, and the same tests fail when RLS is removed.
+- Ticked the schema and RLS tasks in PLAN.md.
+
+**Decisions**
+- Categories, cycles and statuses are `text` with `check` constraints instead of Postgres enums, so adding one later is a simple constraint change.
+- `subscriptions.name` is not unique; the optional `label` tells several subs of one service apart.
+- Seasonal plans store the whole season's price; `season_start_month > season_end_month` means the season wraps the year end (Oct–Jun). Season months are required for seasonal plans and rejected otherwise.
+- `user_id` / `owner_id` default to `auth.uid()`, so the app doesn't have to send them.
+- `reminders_sent` has no insert policy: only the server-side cron (service role) writes to it. A unique key on (subscription, kind, date) stops duplicate reminders.
+- No profile-on-signup trigger yet; that's the Week 7 task.
+
+**Next**
+- Apply the migration in the Supabase dashboard (SQL Editor).
+- Phone app shell, seed data, and `toMonthly` / `toYearly` with Vitest tests.
