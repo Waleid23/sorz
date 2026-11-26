@@ -187,3 +187,18 @@ Week 2 is done. The goal was to get the project set up, and it is.
 **Next**
 - Protect routes: redirect logged-out users to `/login` in the proxy.
 - Create a profile row when a user signs up.
+
+## 2026-11-26: Protect routes (week 3 of 5)
+
+**Done**
+- `src/lib/auth/routes.ts`: `routeDecision(pathname, loggedIn)`. Logged out: every app page goes to `/login`; `/login`, `/signup` and `/auth/*` are let through. Logged in: `/login` and `/signup` go to `/`. 7 new tests (29 total), including look-alike paths such as `/login-help` and `/authx` staying protected.
+- The proxy (`src/lib/supabase/proxy.ts`) applies it using the `getClaims()` result it already fetched, and copies refreshed auth cookies and cache-control headers onto the redirect.
+- Tested: curl against a production build (all tabs and `/subs/123` redirect to `/login` when logged out; login, sign-up, and the confirm link stay open), and by hand while logged in (home after login, `/login` sends you home, log out then `/subs` goes to `/login`).
+
+**Decisions**
+- Next.js 16 calls middleware "proxy"; the PLAN.md task says middleware but it lives in `src/proxy.ts`.
+- The proxy only controls which pages open; RLS still protects the data itself.
+- No "return to the page you wanted after login" yet; it needs a safe-redirect check and isn't needed for the MVP.
+
+**Next**
+- Create a profile row when a user signs up.

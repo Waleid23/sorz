@@ -95,7 +95,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 
 ### Week 7: Accounts and adding subscriptions
 - [x] Sign up, log in, log out (email + password or magic link)
-- [ ] Protect routes with middleware; send logged-out users to login
+- [x] Protect routes with middleware; send logged-out users to login
 - [ ] Create a profile row when a user signs up
 - [ ] "Add subscription" form: name, price, cycle, next billing date, category
 - [ ] Seasonal fields appear only when "seasonal" is selected

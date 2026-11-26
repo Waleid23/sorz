@@ -1,10 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { routeDecision } from "@/lib/auth/routes";
 
 /**
  * Refreshes the Supabase auth session on every matched request and writes
  * any updated auth cookies to both the request and the response.
- * Route protection (redirecting logged-out users) is a later Week 7 task.
+ * Also protects routes: logged-out users go to /login, and logged-in users
+ * skip /login and /signup. (This only guards pages; RLS guards the data.)
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -37,7 +39,26 @@ export async function updateSession(request: NextRequest) {
 
   // Don't put code between createServerClient and getClaims(): this call
   // validates the token and triggers a refresh when it has expired.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const loggedIn = Boolean(data?.claims.sub);
+
+  const decision = routeDecision(request.nextUrl.pathname, loggedIn);
+  if (decision) {
+    const url = request.nextUrl.clone();
+    url.pathname = decision.redirectTo;
+    url.search = "";
+    const redirect = NextResponse.redirect(url);
+    // Carry over refreshed auth cookies and no-cache headers, so the browser
+    // and server sessions stay in sync.
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => redirect.cookies.set(cookie));
+    supabaseResponse.headers.forEach((value, key) => {
+      if (key.toLowerCase() === "cache-control")
+        redirect.headers.set(key, value);
+    });
+    return redirect;
+  }
 
   // Return supabaseResponse as-is. If you build a new response, copy its
   // cookies over, or the browser and server sessions will fall out of sync.
