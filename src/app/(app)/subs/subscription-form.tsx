@@ -174,6 +174,25 @@ export function SubscriptionForm({
       </Field>
 
       <Field
+        name="label"
+        label="Label (optional)"
+        hint="To tell apart several subs of the same service, like a streamer's name."
+        error={errors.label}
+      >
+        <input
+          id="label"
+          name="label"
+          type="text"
+          placeholder="e.g. streamer name, family plan"
+          autoComplete="off"
+          maxLength={100}
+          defaultValue={values.label}
+          className={inputClass}
+          {...errorProps("label", errors.label)}
+        />
+      </Field>
+
+      <Field
         name="price"
         label={seasonal ? "Price for the season" : "Price"}
         hint={

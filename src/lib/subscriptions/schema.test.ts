@@ -50,6 +50,7 @@ describe("subscriptionSchema", () => {
     expect(result).toEqual({
       ...valid,
       price: 15.49,
+      label: null,
       season_start_month: null,
       season_end_month: null,
       is_trial: false,
@@ -313,6 +314,28 @@ describe("status", () => {
   it("rejects anything else", () => {
     expect(errorsFor({ ...valid, status: "deleted" })).toEqual({
       status: ["Choose a status."],
+    });
+  });
+});
+
+describe("label", () => {
+  it("is optional: missing or blank saves as null", () => {
+    expect(subscriptionSchema.parse(valid).label).toBeNull();
+    expect(
+      subscriptionSchema.parse({ ...valid, label: "   " }).label,
+    ).toBeNull();
+  });
+
+  it("is trimmed", () => {
+    expect(
+      subscriptionSchema.parse({ ...valid, label: "  streamerA " }).label,
+    ).toBe("streamerA");
+  });
+
+  it("allows up to 100 characters", () => {
+    expect(errorsFor({ ...valid, label: "x".repeat(100) })).toEqual({});
+    expect(errorsFor({ ...valid, label: "x".repeat(101) })).toEqual({
+      label: ["Keep the label under 100 characters."],
     });
   });
 });

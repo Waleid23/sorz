@@ -305,3 +305,23 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - "Duplicate" action and an optional label field (multiple Twitch subs).
+
+## 2026-11-26: Label field and Duplicate (week 3 of 5)
+
+**Done**
+- Pushed the trial toggle and edit/delete commits; Vercel deploys from `main`.
+- "Label (optional)" field under Service in the add and edit forms, with a hint about telling several subs of one service apart. Trimmed; blank saves as null; up to 100 characters (matching the column).
+- "Duplicate" button on the edit page opens `/subs/new?from=<id>`: the add form filled in from that subscription with the label cleared and status active, plus a "Copied from Twitch (streamerA). Add a label to tell them apart." note. Nothing is saved until you press Save. A malformed or unknown `from` just gives a blank form.
+- `getSubscription(id)` (`src/lib/subscriptions/queries.ts`) is shared by the edit and add pages; `toDuplicateValues` builds the copy. The form skeleton and load-error message moved to `src/app/(app)/subs/form-skeleton.tsx`.
+- 4 new tests (73 total): label optional, trimmed, 100-character limit, and duplicate values.
+- Tested with Playwright at 375px as person1: the edit form shows the label; Duplicate copies name, price and date but not the label or status; a price error keeps the new label; saving gives two rows ("streamerA" still paused, "streamerB" active) in the list and the database; tapping "Add subscription" afterwards gives a blank form; clearing a label saves null. Re-ran the trial and edit tests (all pass). No console errors or server warnings.
+
+**Decisions**
+- Duplicate opens a pre-filled form instead of copying straight to the database, so you can give the copy its label before saving and nothing half-finished gets created.
+- `/subs/new` now reads the URL, so the form streams in behind `<Suspense>` with a skeleton (it shows for a moment).
+
+**Noticed**
+- Next.js 16 keeps the previous page mounted but hidden after navigating (so two `#name` inputs can exist at once). The app behaves correctly; Playwright tests need `:visible` locators.
+
+**Next**
+- Quick-add presets for common services, then the zod validation, empty and loading states pass.

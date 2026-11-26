@@ -19,6 +19,7 @@ export type DeleteSubscriptionState = { error?: string };
 
 const FIELDS: SubscriptionField[] = [
   "name",
+  "label",
   "price",
   "billing_cycle",
   "next_billing_date",

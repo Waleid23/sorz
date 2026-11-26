@@ -59,6 +59,17 @@ const fieldsSchema = z.object({
     .trim()
     .min(1, { error: "Enter the service name." })
     .max(100, { error: "Keep the name under 100 characters." }),
+  // Optional; tells several subs of one service apart (e.g. a streamer's name).
+  label: z
+    .string()
+    .optional()
+    .transform((v) => v?.trim() || null)
+    .pipe(
+      z
+        .string()
+        .max(100, { error: "Keep the label under 100 characters." })
+        .nullable(),
+    ),
   price: z
     .string()
     .transform(parsePrice)

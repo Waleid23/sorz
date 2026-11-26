@@ -7,6 +7,7 @@ export type SubscriptionFormValues = Partial<Record<SubscriptionField, string>>;
 export function toFormValues(sub: Subscription): SubscriptionFormValues {
   return {
     name: sub.name,
+    label: sub.label ?? "",
     // Always two decimals, so 15.5 shows as "15.50".
     price: Number(sub.price).toFixed(2),
     billing_cycle: sub.billing_cycle,
@@ -18,4 +19,12 @@ export function toFormValues(sub: Subscription): SubscriptionFormValues {
     trial_end_date: sub.trial_end_date ?? "",
     status: sub.status,
   };
+}
+
+/**
+ * Starting values for "Duplicate": the same service, price, cycle, dates and
+ * category, but no label (that's what tells the copies apart) and active.
+ */
+export function toDuplicateValues(sub: Subscription): SubscriptionFormValues {
+  return { ...toFormValues(sub), label: "", status: "active" };
 }

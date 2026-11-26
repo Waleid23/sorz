@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { z } from "zod";
 import { PageHeader } from "@/components/page-header";
 import { saveSubscription } from "@/lib/subscriptions/actions";
 import { toFormValues } from "@/lib/subscriptions/form-values";
-import {
-  SUBSCRIPTION_COLUMNS,
-  type Subscription,
-} from "@/lib/subscriptions/types";
-import { createClient } from "@/lib/supabase/server";
+import { getSubscription } from "@/lib/subscriptions/queries";
+import { LoadError, SubscriptionFormSkeleton } from "../form-skeleton";
 import { SubscriptionForm } from "../subscription-form";
 import { DeleteSubscription } from "./delete-subscription";
 
@@ -21,25 +18,8 @@ async function EditSubscription({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  if (!z.uuid().safeParse(id).success) notFound();
-
-  // RLS only returns the user's own rows, so someone else's id is "not found".
-  const supabase = await createClient();
-  const { data: sub, error } = await supabase
-    .from("subscriptions")
-    .select(SUBSCRIPTION_COLUMNS)
-    .eq("id", id)
-    .maybeSingle<Subscription>();
-
-  if (error) {
-    console.error("EditSubscription query failed:", error.code, error.message);
-    return (
-      <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
-        Couldn&apos;t load this subscription. Refresh the page to try again.
-      </p>
-    );
-  }
+  const sub = await getSubscription((await params).id);
+  if (sub === "error") return <LoadError />;
   if (!sub) notFound();
 
   return (
@@ -50,23 +30,18 @@ async function EditSubscription({
         submitLabel="Save changes"
         editing
       />
-      <DeleteSubscription
-        id={sub.id}
-        name={sub.label ? `${sub.name} (${sub.label})` : sub.name}
-      />
-    </div>
-  );
-}
-
-function EditSubscriptionSkeleton() {
-  return (
-    <div className="flex flex-col gap-5" aria-hidden="true">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="h-[4.75rem] animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900"
+      <div className="flex flex-col gap-3">
+        <Link
+          href={`/subs/new?from=${sub.id}`}
+          className="flex h-12 items-center justify-center rounded-xl border border-zinc-300 text-base font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          Duplicate
+        </Link>
+        <DeleteSubscription
+          id={sub.id}
+          name={sub.label ? `${sub.name} (${sub.label})` : sub.name}
         />
-      ))}
+      </div>
     </div>
   );
 }
@@ -78,7 +53,7 @@ export default function EditSubscriptionPage({
     <>
       <PageHeader title="Edit subscription" backHref="/subs" />
       <main className="mx-auto w-full max-w-2xl px-4 py-6">
-        <Suspense fallback={<EditSubscriptionSkeleton />}>
+        <Suspense fallback={<SubscriptionFormSkeleton />}>
           <EditSubscription params={params} />
         </Suspense>
       </main>

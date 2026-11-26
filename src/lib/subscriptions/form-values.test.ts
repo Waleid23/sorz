@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toFormValues } from "./form-values";
+import { toDuplicateValues, toFormValues } from "./form-values";
 import { subscriptionSchema } from "./schema";
 import type { Subscription } from "./types";
 
@@ -62,6 +62,7 @@ describe("toFormValues", () => {
     for (const sub of subs) {
       expect(roundTrip(sub)).toEqual({
         name: sub.name,
+        label: sub.label,
         price: Number(sub.price),
         billing_cycle: sub.billing_cycle,
         next_billing_date: sub.next_billing_date,
@@ -86,5 +87,25 @@ describe("toFormValues", () => {
     expect(result.is_trial).toBe(false);
     expect(result.trial_end_date).toBeNull();
     expect(result.next_billing_date).toBe("2026-11-28");
+  });
+});
+
+describe("toDuplicateValues", () => {
+  it("copies everything except the label, and starts active", () => {
+    const paused = { ...base, status: "paused" as const };
+    const copy = toDuplicateValues(paused);
+    expect(copy).toEqual({
+      ...toFormValues(paused),
+      label: "",
+      status: "active",
+    });
+    const saved = subscriptionSchema.parse(copy);
+    expect(saved).toMatchObject({
+      name: "Twitch",
+      label: null,
+      price: 5.99,
+      next_billing_date: "2026-12-02",
+      status: "active",
+    });
   });
 });
