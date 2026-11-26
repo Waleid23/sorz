@@ -215,3 +215,20 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - "Add subscription" form: name, price, cycle, next billing date, category.
+
+## 2026-11-26: "Add subscription" form (week 3 of 5)
+
+**Done**
+- `/subs/new` with fields for service name, price (`$9.99` and `1,200` accepted; decimal keypad), billed monthly/yearly (two big radio buttons), next billing date (native date picker), and category (all 8). The Subs tab has an "Add subscription" button and shows "Subscription saved." after a save. `PageHeader` gained an optional back arrow.
+- `addSubscription` Server Action re-checks the session, validates with zod (`src/lib/subscriptions/schema.ts`), inserts the row, and redirects to `/subs?added=1`. Errors show under each field, and typed values stay filled in.
+- Installed zod 4. 9 new tests (38 total): price parsing, real calendar dates including Feb 29 only in leap years, unknown cycles and categories, and duplicate names allowed.
+- Saved the test account's login in `.env.local` (gitignored) so Playwright can test logged-in pages.
+- Tested end to end with Playwright at 375px against the real Supabase project: login, empty-form errors, bad price, a valid yearly save, then read the row back through the API as person1 (correct owner; person1 sees only their own 6 rows). The test row was deleted afterwards.
+
+**Decisions**
+- Seasonal isn't offered in the form yet; it arrives with its season-month fields in the next task.
+- Started using zod now rather than writing throwaway validation; the later "zod validation, empty and loading states" task still covers the rest.
+- Price is capped at $10,000 in the form to catch typos (the column allows more).
+
+**Next**
+- Seasonal fields, the trial toggle, then the subscription list grouped by category.

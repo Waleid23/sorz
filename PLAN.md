@@ -97,7 +97,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Sign up, log in, log out (email + password or magic link)
 - [x] Protect routes with middleware; send logged-out users to login
 - [x] Create a profile row when a user signs up
-- [ ] "Add subscription" form: name, price, cycle, next billing date, category
+- [x] "Add subscription" form: name, price, cycle, next billing date, category
 - [ ] Seasonal fields appear only when "seasonal" is selected
 - [ ] Free trial toggle with a trial end date
 - [ ] Subscription list grouped by category, with category icons/colors
