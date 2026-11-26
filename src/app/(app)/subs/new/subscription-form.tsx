@@ -1,12 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, type ReactNode } from "react";
+import {
+  startTransition,
+  useActionState,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import {
   addSubscription,
   type AddSubscriptionState,
 } from "@/lib/subscriptions/actions";
-import { CATEGORIES, FORM_BILLING_CYCLES } from "@/lib/subscriptions/options";
+import {
+  CATEGORIES,
+  FORM_BILLING_CYCLES,
+  MONTHS,
+} from "@/lib/subscriptions/options";
 import type { NewSubscriptionField } from "@/lib/subscriptions/schema";
 
 const inputClass =
@@ -15,11 +25,13 @@ const inputClass =
 function Field({
   name,
   label,
+  hint,
   error,
   children,
 }: {
   name: NewSubscriptionField;
   label: string;
+  hint?: string;
   error?: string;
   children: ReactNode;
 }) {
@@ -29,6 +41,9 @@ function Field({
         {label}
       </label>
       {children}
+      {hint && (
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">{hint}</p>
+      )}
       {error && (
         <p
           id={`${name}-error`}
@@ -55,10 +70,27 @@ export function SubscriptionForm() {
   >(addSubscription, {});
   const errors = state.errors ?? {};
   const values = state.values ?? {};
-  const cycle = values.billing_cycle || "monthly";
+  // Controlled so the season fields can appear and disappear as it changes.
+  const [cycle, setCycle] = useState<string>(values.billing_cycle || "monthly");
+  const seasonal = cycle === "seasonal";
+
+  // React resets a form after its `action` runs, which would snap the
+  // controlled billing-cycle radios back to their first value while the
+  // season fields stay visible. Submitting manually skips that reset, so
+  // everything the user entered stays put when there's an error.
+  function submitWithoutReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(() => formAction(formData));
+  }
 
   return (
-    <form action={formAction} className="flex flex-col gap-5" noValidate>
+    <form
+      action={formAction}
+      onSubmit={submitWithoutReset}
+      className="flex flex-col gap-5"
+      noValidate
+    >
       <Field name="name" label="Service" error={errors.name}>
         <input
           id="name"
@@ -74,7 +106,12 @@ export function SubscriptionForm() {
         />
       </Field>
 
-      <Field name="price" label="Price" error={errors.price}>
+      <Field
+        name="price"
+        label={seasonal ? "Price for the season" : "Price"}
+        hint={seasonal ? "The total you pay for the whole season." : undefined}
+        error={errors.price}
+      >
         <div className="relative">
           <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
             $
@@ -95,14 +132,15 @@ export function SubscriptionForm() {
 
       <fieldset className="flex flex-col gap-1.5">
         <legend className="mb-1.5 text-sm font-medium">Billed</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {FORM_BILLING_CYCLES.map((option) => (
             <label key={option.value} className="relative">
               <input
                 type="radio"
                 name="billing_cycle"
                 value={option.value}
-                defaultChecked={cycle === option.value}
+                checked={cycle === option.value}
+                onChange={() => setCycle(option.value)}
                 className="peer sr-only"
               />
               <span className="flex h-12 cursor-pointer items-center justify-center rounded-xl border border-zinc-300 text-base font-medium peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 dark:border-zinc-700 dark:peer-checked:border-indigo-400 dark:peer-checked:bg-indigo-950/50 dark:peer-checked:text-indigo-300">
@@ -118,9 +156,41 @@ export function SubscriptionForm() {
         )}
       </fieldset>
 
+      {/* Only rendered (and submitted) for seasonal plans. */}
+      {seasonal && (
+        <div className="grid grid-cols-2 gap-3">
+          {(
+            [
+              ["season_start_month", "Season starts"],
+              ["season_end_month", "Season ends"],
+            ] as const
+          ).map(([name, label]) => (
+            <Field key={name} name={name} label={label} error={errors[name]}>
+              <select
+                id={name}
+                name={name}
+                defaultValue={values[name] ?? ""}
+                className={inputClass}
+                {...errorProps(name, errors[name])}
+              >
+                <option value="" disabled>
+                  Month…
+                </option>
+                {MONTHS.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          ))}
+        </div>
+      )}
+
       <Field
         name="next_billing_date"
         label="Next billing date"
+        hint={seasonal ? "When you're next charged for a season." : undefined}
         error={errors.next_billing_date}
       >
         <input

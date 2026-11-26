@@ -13,12 +13,25 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number]["value"];
 
-/**
- * Billing cycles offered in the form. "seasonal" is supported by the database
- * and cost helpers; it joins this list along with its season-month fields
- * (next PLAN.md task).
- */
+/** Billing cycles offered in the form. Seasonal plans also need season months. */
 export const FORM_BILLING_CYCLES = [
   { value: "monthly", label: "Monthly" },
   { value: "yearly", label: "Yearly" },
+  { value: "seasonal", label: "Seasonal" },
 ] as const;
+
+/** Month choices for a season's start and end; value is 1-12. */
+export const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+].map((label, i) => ({ value: i + 1, label }));

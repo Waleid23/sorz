@@ -47,7 +47,12 @@ describe("newSubscriptionSchema", () => {
       name: "  Netflix  ",
       price: "$15.49",
     });
-    expect(result).toEqual({ ...valid, price: 15.49 });
+    expect(result).toEqual({
+      ...valid,
+      price: 15.49,
+      season_start_month: null,
+      season_end_month: null,
+    });
   });
 
   it("allows the same name twice (several Twitch subs)", () => {
@@ -101,9 +106,6 @@ describe("newSubscriptionSchema", () => {
     expect(
       errorsFor({ ...valid, billing_cycle: "weekly" }).billing_cycle,
     ).toBeDefined();
-    expect(
-      errorsFor({ ...valid, billing_cycle: "seasonal" }).billing_cycle,
-    ).toBeDefined();
     expect(errorsFor({ ...valid, category: "movies" }).category).toEqual([
       "Choose a category.",
     ]);
@@ -122,5 +124,85 @@ describe("newSubscriptionSchema", () => {
     ]) {
       expect(errorsFor({ ...valid, category })).toEqual({});
     }
+  });
+});
+
+describe("seasonal plans", () => {
+  const seasonal = {
+    ...valid,
+    name: "NBA League Pass",
+    price: "109.99",
+    billing_cycle: "seasonal",
+    category: "sports",
+  };
+
+  it("accepts a season that wraps the year end (Oct-Jun)", () => {
+    const result = newSubscriptionSchema.parse({
+      ...seasonal,
+      season_start_month: "10",
+      season_end_month: "6",
+    });
+    expect(result).toMatchObject({
+      billing_cycle: "seasonal",
+      season_start_month: 10,
+      season_end_month: 6,
+    });
+  });
+
+  it("accepts a one-month season", () => {
+    expect(
+      errorsFor({
+        ...seasonal,
+        season_start_month: "5",
+        season_end_month: "5",
+      }),
+    ).toEqual({});
+  });
+
+  it("requires both months", () => {
+    expect(errorsFor(seasonal)).toEqual({
+      season_start_month: ["Choose the month the season starts."],
+      season_end_month: ["Choose the month the season ends."],
+    });
+    expect(
+      errorsFor({
+        ...seasonal,
+        season_start_month: "10",
+        season_end_month: "",
+      }),
+    ).toEqual({ season_end_month: ["Choose the month the season ends."] });
+  });
+
+  it("reports missing months together with other errors", () => {
+    const errors = errorsFor({ ...seasonal, name: "", price: "abc" });
+    expect(Object.keys(errors).sort()).toEqual([
+      "name",
+      "price",
+      "season_end_month",
+      "season_start_month",
+    ]);
+  });
+
+  it("rejects months outside 1-12", () => {
+    for (const bad of ["0", "13", "1.5", "abc"]) {
+      expect(
+        errorsFor({
+          ...seasonal,
+          season_start_month: bad,
+          season_end_month: "6",
+        }).season_start_month,
+      ).toBeDefined();
+    }
+  });
+
+  it("clears season months on monthly and yearly plans", () => {
+    const result = newSubscriptionSchema.parse({
+      ...valid,
+      billing_cycle: "yearly",
+      season_start_month: "10",
+      season_end_month: "6",
+    });
+    expect(result.season_start_month).toBeNull();
+    expect(result.season_end_month).toBeNull();
   });
 });

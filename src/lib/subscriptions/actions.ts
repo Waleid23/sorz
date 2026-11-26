@@ -19,6 +19,8 @@ const FIELDS: NewSubscriptionField[] = [
   "billing_cycle",
   "next_billing_date",
   "category",
+  "season_start_month",
+  "season_end_month",
 ];
 
 export async function addSubscription(

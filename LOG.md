@@ -249,3 +249,20 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Seasonal fields in the form, then the free-trial toggle.
+
+## 2026-11-26: Seasonal fields in the form (week 3 of 5)
+
+**Done**
+- "Seasonal" joined Monthly and Yearly in the add form. Choosing it shows "Season starts" / "Season ends" month pickers, relabels the price "Price for the season" (with a hint), and adds a hint to the billing date. The pickers aren't rendered, or submitted, for other cycles.
+- Schema: season months are required for seasonal plans (each missing one gets its own message) and cleared to null for monthly and yearly plans, matching the database constraint. Seasons can wrap the year end (Sep–Jan) or be a single month. 6 new tests (55 total).
+- Tested with Playwright as person1: fields appear and disappear with the cycle, missing months and a bad price are all reported together, and a Sep–Jan $350 season saves as seasonal 9→1. The Sports subtotal shows $82.22 ($350 ÷ 5 + $109.99 ÷ 9 in November). Test row deleted.
+
+**Bugs found and fixed**
+- zod skipped the season-month check whenever another field (like price) failed to parse, so month errors only showed on a second try. Fixed with the refinement's `when` option.
+- React 19 resets a form after its action runs. That snapped the controlled billing-cycle radios back to "Monthly" while the season fields stayed visible, so fixing an error and saving stored a monthly plan. Fixed by submitting through `onSubmit` + `startTransition`, which skips the reset and keeps everything the user entered.
+
+**Noticed**
+- iCloud is syncing the Desktop folder (`~/Desktop` is linked into iCloud Drive) and has been creating " 2" copies of files, including in `.next`, where `routes.d 2.ts` broke the typecheck. Removed the copies in `.next`; the untracked " 2" files in the repo are still there.
+
+**Next**
+- Free-trial toggle with a trial end date.
