@@ -1,14 +1,14 @@
-/** Choices shown in the subscription form. Values match the database check constraints. */
+/** Choices shown in the subscription form and list. Values match the database check constraints. */
 
 export const CATEGORIES = [
-  { value: "streaming", label: "Streaming" },
-  { value: "gaming", label: "Gaming" },
-  { value: "food_delivery", label: "Food Delivery" },
-  { value: "shopping", label: "Shopping" },
-  { value: "cloud_storage", label: "Cloud Storage" },
-  { value: "music", label: "Music" },
-  { value: "sports", label: "Sports" },
-  { value: "other", label: "Other" },
+  { value: "streaming", label: "Streaming", icon: "📺" },
+  { value: "gaming", label: "Gaming", icon: "🎮" },
+  { value: "food_delivery", label: "Food Delivery", icon: "🍔" },
+  { value: "shopping", label: "Shopping", icon: "🛍️" },
+  { value: "cloud_storage", label: "Cloud Storage", icon: "☁️" },
+  { value: "music", label: "Music", icon: "🎵" },
+  { value: "sports", label: "Sports", icon: "🏀" },
+  { value: "other", label: "Other", icon: "📦" },
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number]["value"];

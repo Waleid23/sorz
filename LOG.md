@@ -232,3 +232,20 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Seasonal fields, the trial toggle, then the subscription list grouped by category.
+
+## 2026-11-26: Subscription list grouped by category (week 3 of 5)
+
+**Done**
+- The Subs tab lists the user's subscriptions grouped by category, in the fixed category order, each with an emoji icon on a tinted circle, a count, and a monthly subtotal. Rows show name, label, Trial / Paused / Cancelled badges, "Renews Dec 8" (or "Trial ends ..."), and price with "/mo", "/yr" or "/season". There's an empty state, an error message, and a loading skeleton; the list streams in behind `<Suspense>` while the rest of the page is prerendered.
+- `groupByCategory` (`src/lib/subscriptions/group.ts`) sorts active subs first, then by soonest renewal, then name and label, and totals each group with `toMonthly` for the current month. Paused and cancelled subs are listed last and left out of totals.
+- `src/lib/format.ts`: `formatMoney`, `cycleSuffix`, `formatShortDate` (formats in UTC so "2026-12-01" never shows as Nov 30; adds the year when it isn't this year).
+- 11 new tests (49 total), passing in both America/Los_Angeles and Asia/Tokyo time zones.
+- Tested as person1 with Playwright at 375px in light and dark mode: 3 groups with correct subtotals (Streaming $37.47, Food Delivery $9.99, Sports $12.22 = $109.99 ÷ 9 in season), no horizontal scroll, and a subscription added through the form shows up immediately (test row deleted afterwards).
+
+**Decisions**
+- Built the list before the seasonal and trial form fields (PLAN.md order swapped) so saved subscriptions are visible in the app.
+- Emoji icons instead of an icon library: colorful, native on phones, no dependency.
+- Group subtotals use the current month (UTC), so a seasonal plan counts only in season.
+
+**Next**
+- Seasonal fields in the form, then the free-trial toggle.

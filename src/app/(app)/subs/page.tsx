@@ -3,6 +3,10 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
 import { AddedNotice } from "./added-notice";
+import {
+  SubscriptionList,
+  SubscriptionListSkeleton,
+} from "./subscription-list";
 
 export const metadata: Metadata = { title: "Subscriptions · Sorz" };
 
@@ -24,9 +28,10 @@ export default function SubsPage() {
           </span>
           Add subscription
         </Link>
-        <p className="rounded-2xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          Your subscriptions, grouped by category, will show here.
-        </p>
+        {/* Reads the session and database, so it streams in behind Suspense. */}
+        <Suspense fallback={<SubscriptionListSkeleton />}>
+          <SubscriptionList />
+        </Suspense>
       </main>
     </>
   );
