@@ -150,3 +150,20 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - `toMonthly` / `toYearly` with Vitest tests.
+
+## 2026-11-26: Cost normalization (week 3 of 5)
+
+**Done**
+- `src/lib/costs.ts`: `toMonthly(sub, month)`, `toYearly(sub)`, plus `seasonLength` and `isInSeason`.
+- Installed Vitest 5 (`npm test`, `npm run test:watch`; config in `vitest.config.mts`). Bumped `@types/node` from 20 to 24 to match the Node 24 runtime, which Vitest 5 requires.
+- 16 tests in `src/lib/costs.test.ts`: every cycle, seasons that wrap the year end (Oct–Jun) and ones that don't, one-month and twelve-month seasons, a season's months adding back up to its price, bad or missing months, and a multi-sub total (three Twitch subs + Prime). Breaking the season-length formula makes 3 tests fail.
+- That finishes the Week 6 (scaffold) list in PLAN.md.
+
+**Decisions**
+- `toMonthly` takes the calendar month, because a seasonal plan's monthly cost depends on it: in season it's price ÷ season length, off season it's 0. For monthly and yearly plans the month doesn't change the result.
+- A seasonal plan's yearly cost is its season price (charged once a year).
+- No rounding in the helpers; round only when displaying, so sums don't drift.
+- Helpers throw on bad input (missing season months, month outside 1–12) instead of silently returning 0.
+
+**Next**
+- Week 7 list: sign up / log in / log out, then protect routes.

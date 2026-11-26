@@ -22,4 +22,4 @@ Sorz is a phone-first subscription tracker web app (Artifact 5 moonshot, a five-
 - Keep changes small and focused, matching the PLAN.md tasks. Don't write code for features outside the current week's scope unless asked.
 
 ## Status
-Week 2 of 5 done (week 1 was planning, week 2 setup). The Next.js app is scaffolded, Supabase is connected (client helpers in `src/lib/supabase/`, session refresh in `src/proxy.ts`), and the app is live at https://sorz-eight.vercel.app. Next (week 3): database schema with RLS on every table, then the app shell, seed data, and `toMonthly` / `toYearly` with tests.
+Week 2 of 5 done (week 1 was planning, week 2 setup). The Next.js app is scaffolded, Supabase is connected (client helpers in `src/lib/supabase/`, session refresh in `src/proxy.ts`), and the app is live at https://sorz-eight.vercel.app. Week 3 so far: the schema with RLS is applied (`supabase/migrations/`), the phone app shell with bottom nav is live, seed data for two test users is loaded (`supabase/seed.sql`), and `toMonthly` / `toYearly` are in `src/lib/costs.ts` with Vitest tests (`npm test`). Next: the Week 7 list in PLAN.md, starting with sign up / log in.

@@ -91,7 +91,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Write the database schema as SQL migrations (tables above) and commit them
 - [x] Turn on RLS for every table, with owner-only policies
 - [x] Add seed data (Person 1's and Person 2's subscriptions) for local testing
-- [ ] Write a cost-normalization helper (`toMonthly`, `toYearly`) plus unit tests (Vitest), including seasonal cases
+- [x] Write a cost-normalization helper (`toMonthly`, `toYearly`) plus unit tests (Vitest), including seasonal cases
 
 ### Week 7: Accounts and adding subscriptions
 - [ ] Sign up, log in, log out (email + password or magic link)
