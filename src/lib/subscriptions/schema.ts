@@ -1,11 +1,13 @@
 import { z } from "zod";
-import { CATEGORIES, FORM_BILLING_CYCLES } from "./options";
+import { CATEGORIES, FORM_BILLING_CYCLES, STATUSES } from "./options";
 
 const categoryValues = CATEGORIES.map((c) => c.value) as [string, ...string[]];
 const cycleValues = FORM_BILLING_CYCLES.map((c) => c.value) as [
   string,
   ...string[],
 ];
+
+const statusValues = STATUSES.map((s) => s.value) as [string, ...string[]];
 
 /** Largest price the form accepts (the column allows more; this catches typos). */
 export const MAX_PRICE = 10_000;
@@ -80,15 +82,21 @@ const fieldsSchema = z.object({
     .optional()
     .transform((v) => v === "on"),
   trial_end_date: dateField,
+  // Only the edit form shows a status; new subscriptions start active.
+  status: z
+    .string()
+    .optional()
+    .transform((v) => v || "active")
+    .pipe(z.enum(statusValues, { error: "Choose a status." })),
 });
 
 /**
- * Validates the "Add subscription" form. Field names match the form inputs.
+ * Validates the add and edit subscription forms. Field names match the form inputs.
  * Season months are required for seasonal plans and cleared for the others
  * (matching the database constraint). A season may wrap the year end.
  * Trials need an end date, which also becomes the next billing date.
  */
-export const newSubscriptionSchema = fieldsSchema
+export const subscriptionSchema = fieldsSchema
   .superRefine(
     (data, ctx) => {
       // A trial's first charge is when it ends, so the form asks for the
@@ -145,5 +153,5 @@ export const newSubscriptionSchema = fieldsSchema
     trial_end_date: data.is_trial ? data.trial_end_date : null,
   }));
 
-export type NewSubscription = z.output<typeof newSubscriptionSchema>;
-export type NewSubscriptionField = keyof NewSubscription;
+export type SubscriptionInput = z.output<typeof subscriptionSchema>;
+export type SubscriptionField = keyof SubscriptionInput;

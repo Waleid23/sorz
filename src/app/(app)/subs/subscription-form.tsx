@@ -8,16 +8,15 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import {
-  addSubscription,
-  type AddSubscriptionState,
-} from "@/lib/subscriptions/actions";
+import type { SubscriptionFormState } from "@/lib/subscriptions/actions";
+import type { SubscriptionFormValues } from "@/lib/subscriptions/form-values";
 import {
   CATEGORIES,
   FORM_BILLING_CYCLES,
   MONTHS,
+  STATUSES,
 } from "@/lib/subscriptions/options";
-import type { NewSubscriptionField } from "@/lib/subscriptions/schema";
+import type { SubscriptionField } from "@/lib/subscriptions/schema";
 
 const inputClass =
   "h-12 w-full rounded-xl border border-zinc-300 bg-white px-3 text-base outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900";
@@ -29,7 +28,7 @@ function Field({
   error,
   children,
 }: {
-  name: NewSubscriptionField;
+  name: SubscriptionField;
   label: string;
   hint?: string;
   error?: string;
@@ -57,23 +56,90 @@ function Field({
 }
 
 /** aria attributes that link an input to its error message. */
-function errorProps(name: NewSubscriptionField, error?: string) {
+function errorProps(name: SubscriptionField, error?: string) {
   return error
     ? { "aria-invalid": true, "aria-describedby": `${name}-error` }
     : {};
 }
 
-export function SubscriptionForm() {
+/** Big tappable radio buttons in a row (billing cycle, status). */
+function SegmentedChoice({
+  name,
+  legend,
+  options,
+  value,
+  onChange,
+  error,
+  hint,
+}: {
+  name: SubscriptionField;
+  legend: string;
+  options: readonly { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  hint?: string;
+}) {
+  return (
+    <fieldset className="flex flex-col gap-1.5">
+      <legend className="mb-1.5 text-sm font-medium">{legend}</legend>
+      <div className="grid grid-cols-3 gap-2">
+        {options.map((option) => (
+          <label key={option.value} className="relative">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              className="peer sr-only"
+            />
+            <span className="flex h-12 cursor-pointer items-center justify-center rounded-xl border border-zinc-300 text-base font-medium peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 dark:border-zinc-700 dark:peer-checked:border-indigo-400 dark:peer-checked:bg-indigo-950/50 dark:peer-checked:text-indigo-300">
+              {option.label}
+            </span>
+          </label>
+        ))}
+      </div>
+      {hint && (
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">{hint}</p>
+      )}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
+    </fieldset>
+  );
+}
+
+/**
+ * The add and edit subscription form. `action` is `saveSubscription` with
+ * the subscription id bound (null when adding). The status choice only
+ * shows when editing.
+ */
+export function SubscriptionForm({
+  action,
+  initialValues = {},
+  submitLabel,
+  editing = false,
+}: {
+  action: (
+    state: SubscriptionFormState,
+    formData: FormData,
+  ) => Promise<SubscriptionFormState>;
+  initialValues?: SubscriptionFormValues;
+  submitLabel: string;
+  editing?: boolean;
+}) {
   const [state, formAction, pending] = useActionState<
-    AddSubscriptionState,
+    SubscriptionFormState,
     FormData
-  >(addSubscription, {});
+  >(action, { values: initialValues });
   const errors = state.errors ?? {};
   const values = state.values ?? {};
   // Controlled so the season fields can appear and disappear as it changes.
   const [cycle, setCycle] = useState<string>(values.billing_cycle || "monthly");
   const seasonal = cycle === "seasonal";
   const [trial, setTrial] = useState(values.is_trial === "on");
+  const [status, setStatus] = useState<string>(values.status || "active");
 
   // React resets a form after its `action` runs, which would snap the
   // controlled billing-cycle radios back to their first value while the
@@ -138,31 +204,14 @@ export function SubscriptionForm() {
         </div>
       </Field>
 
-      <fieldset className="flex flex-col gap-1.5">
-        <legend className="mb-1.5 text-sm font-medium">Billed</legend>
-        <div className="grid grid-cols-3 gap-2">
-          {FORM_BILLING_CYCLES.map((option) => (
-            <label key={option.value} className="relative">
-              <input
-                type="radio"
-                name="billing_cycle"
-                value={option.value}
-                checked={cycle === option.value}
-                onChange={() => setCycle(option.value)}
-                className="peer sr-only"
-              />
-              <span className="flex h-12 cursor-pointer items-center justify-center rounded-xl border border-zinc-300 text-base font-medium peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 dark:border-zinc-700 dark:peer-checked:border-indigo-400 dark:peer-checked:bg-indigo-950/50 dark:peer-checked:text-indigo-300">
-                {option.label}
-              </span>
-            </label>
-          ))}
-        </div>
-        {errors.billing_cycle && (
-          <p className="text-sm text-red-600 dark:text-red-400">
-            {errors.billing_cycle}
-          </p>
-        )}
-      </fieldset>
+      <SegmentedChoice
+        name="billing_cycle"
+        legend="Billed"
+        options={FORM_BILLING_CYCLES}
+        value={cycle}
+        onChange={setCycle}
+        error={errors.billing_cycle}
+      />
 
       {/* Only rendered (and submitted) for seasonal plans. */}
       {seasonal && (
@@ -268,6 +317,18 @@ export function SubscriptionForm() {
         </select>
       </Field>
 
+      {editing && (
+        <SegmentedChoice
+          name="status"
+          legend="Status"
+          options={STATUSES}
+          value={status}
+          onChange={setStatus}
+          error={errors.status}
+          hint="Paused and cancelled subscriptions don't count toward your spending."
+        />
+      )}
+
       <div aria-live="polite" className="empty:hidden">
         {state.formError && (
           <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
@@ -282,7 +343,7 @@ export function SubscriptionForm() {
           disabled={pending}
           className="h-12 rounded-xl bg-indigo-600 text-base font-semibold text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-60"
         >
-          {pending ? "Saving…" : "Save subscription"}
+          {pending ? "Saving…" : submitLabel}
         </button>
         <Link
           href="/subs"

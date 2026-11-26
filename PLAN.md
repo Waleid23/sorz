@@ -101,7 +101,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Seasonal fields appear only when "seasonal" is selected
 - [x] Free trial toggle with a trial end date
 - [x] Subscription list grouped by category, with category icons/colors
-- [ ] Edit and delete a subscription; mark it as cancelled or paused
+- [x] Edit and delete a subscription; mark it as cancelled or paused
 - [ ] "Duplicate" action and an optional label field (multiple Twitch subs)
 - [ ] Quick-add presets for common services (Netflix, Hulu, Crunchyroll, DashPass, Game Pass, iCloud+, Prime, Twitch...)
 - [ ] Form validation (zod) and empty and loading states

@@ -20,6 +20,13 @@ export const FORM_BILLING_CYCLES = [
   { value: "seasonal", label: "Seasonal" },
 ] as const;
 
+/** Subscription statuses, offered in the edit form. Only active ones count toward spending. */
+export const STATUSES = [
+  { value: "active", label: "Active" },
+  { value: "paused", label: "Paused" },
+  { value: "cancelled", label: "Cancelled" },
+] as const;
+
 /** Month choices for a season's start and end; value is 1-12. */
 export const MONTHS = [
   "January",

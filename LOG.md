@@ -285,3 +285,23 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Edit and delete a subscription; mark it as cancelled or paused.
+
+## 2026-11-26: Edit, delete, pause, and cancel (week 3 of 5)
+
+**Done**
+- Rows in the Subs list are now links (with a chevron) to `/subs/[id]`, an edit page that reuses the add form filled in with the saved values. The edit form adds a Status choice (Active / Paused / Cancelled) with a note that paused and cancelled subs don't count toward spending.
+- Delete button at the bottom of the edit page asks for confirmation first ("Delete Twitch (streamerA)?", with "Keep it" focused) and suggests Paused or Cancelled as the alternative.
+- One `saveSubscription(id | null)` Server Action handles add and edit; `deleteSubscription(id)` handles delete. Both re-check the session, reject malformed ids, and use `.select("id")` to tell "saved" from "not found" (RLS hides other users' rows). After saving, `/subs` shows "Changes saved." or "Subscription deleted."
+- The edit page reads `params` and the database inside `<Suspense>` (Cache Components) and shows Next's not-found page for unknown or malformed ids.
+- Renamed `newSubscriptionSchema` to `subscriptionSchema` (it covers editing now) and moved the form to `src/app/(app)/subs/subscription-form.tsx`. Added `status` to the schema (defaults to active, so the add form doesn't send it) and `toFormValues` (`src/lib/subscriptions/form-values.ts`). 6 new tests (69 total), including that saving an unchanged monthly, seasonal, or trial sub gives back the same row.
+- Tested with Playwright (Chrome, 375px, light and dark) as person1 on a throwaway row: tap a row, every field is filled in, bad price keeps the edits, saving turns a trial off and pauses it ($17.99, Paused badge, label untouched in the database), unknown and malformed ids show not found, "Keep it" cancels, delete removes the row from the list and the database. No console errors. Re-ran the trial test too.
+
+**Bugs found and fixed**
+- The dev server logged "encountered the unstable value `Date.now()` while prerendering" on `/subs` (already there before this change) and on the new edit page. Supabase checks token expiry with `Date.now()`; Next.js 16 wants such code marked request-time only. Fixed with `await connection()` in the server `createClient()`, which covers every page that reads the database.
+
+**Decisions**
+- Status lives in the edit form rather than separate quick buttons: one place to change things, and fewer actions to build. Quick actions could come with polish.
+- The label isn't in the form yet, so editing leaves it untouched; the label field is the next task.
+
+**Next**
+- "Duplicate" action and an optional label field (multiple Twitch subs).

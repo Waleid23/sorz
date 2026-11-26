@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cycleSuffix, formatMoney, formatShortDate } from "@/lib/format";
 import { groupByCategory, countsTowardTotals } from "@/lib/subscriptions/group";
 import type { Category } from "@/lib/subscriptions/options";
@@ -49,32 +50,49 @@ function SubscriptionRow({ sub, year }: { sub: Subscription; year: number }) {
   const inactive = !countsTowardTotals(sub);
   const status = STATUS_BADGE[sub.status];
   return (
-    <li
-      className={`flex min-h-16 items-center gap-3 px-4 py-3 ${inactive ? "opacity-60" : ""}`}
-    >
-      <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium">
-          <span className="truncate">{sub.name}</span>
-          {sub.label && (
-            <span className="truncate text-sm font-normal text-zinc-500 dark:text-zinc-400">
-              {sub.label}
-            </span>
-          )}
-          {sub.is_trial && <Badge tone="amber">Trial</Badge>}
-          {status && <Badge tone="zinc">{status}</Badge>}
+    <li>
+      <Link
+        href={`/subs/${sub.id}`}
+        className="flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo-500 active:bg-zinc-100 dark:hover:bg-zinc-800/50 dark:active:bg-zinc-800"
+      >
+        <div className={`min-w-0 flex-1 ${inactive ? "opacity-60" : ""}`}>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium">
+            <span className="truncate">{sub.name}</span>
+            {sub.label && (
+              <span className="truncate text-sm font-normal text-zinc-500 dark:text-zinc-400">
+                {sub.label}
+              </span>
+            )}
+            {sub.is_trial && <Badge tone="amber">Trial</Badge>}
+            {status && <Badge tone="zinc">{status}</Badge>}
+          </p>
+          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+            {sub.is_trial && sub.trial_end_date
+              ? `Trial ends ${formatShortDate(sub.trial_end_date, year)}`
+              : `Renews ${formatShortDate(sub.next_billing_date, year)}`}
+          </p>
+        </div>
+        <p
+          className={`shrink-0 text-right font-semibold tabular-nums ${inactive ? "opacity-60" : ""}`}
+        >
+          {formatMoney(sub.price, sub.currency)}
+          <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">
+            {cycleSuffix(sub.billing_cycle)}
+          </span>
         </p>
-        <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-          {sub.is_trial && sub.trial_end_date
-            ? `Trial ends ${formatShortDate(sub.trial_end_date, year)}`
-            : `Renews ${formatShortDate(sub.next_billing_date, year)}`}
-        </p>
-      </div>
-      <p className="shrink-0 text-right font-semibold tabular-nums">
-        {formatMoney(sub.price, sub.currency)}
-        <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">
-          {cycleSuffix(sub.billing_cycle)}
-        </span>
-      </p>
+        <svg
+          viewBox="0 0 24 24"
+          className="-mr-1 size-5 shrink-0 text-zinc-400"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </Link>
     </li>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
-import { AddedNotice } from "./added-notice";
+import { SavedNotice } from "./saved-notice";
 import {
   SubscriptionList,
   SubscriptionListSkeleton,
@@ -17,7 +17,7 @@ export default function SubsPage() {
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-6">
         {/* Reads the URL, so it sits behind Suspense (cacheComponents). */}
         <Suspense fallback={null}>
-          <AddedNotice />
+          <SavedNotice />
         </Suspense>
         <Link
           href="/subs/new"

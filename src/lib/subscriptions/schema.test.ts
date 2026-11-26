@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { newSubscriptionSchema, parsePrice } from "./schema";
+import { subscriptionSchema, parsePrice } from "./schema";
 
 const valid = {
   name: "Netflix",
@@ -11,7 +11,7 @@ const valid = {
 };
 
 function errorsFor(input: Record<string, unknown>) {
-  const result = newSubscriptionSchema.safeParse(input);
+  const result = subscriptionSchema.safeParse(input);
   return result.success ? {} : z.flattenError(result.error).fieldErrors;
 }
 
@@ -40,9 +40,9 @@ describe("parsePrice", () => {
   });
 });
 
-describe("newSubscriptionSchema", () => {
+describe("subscriptionSchema", () => {
   it("accepts a valid subscription and cleans it up", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...valid,
       name: "  Netflix  ",
       price: "$15.49",
@@ -54,6 +54,7 @@ describe("newSubscriptionSchema", () => {
       season_end_month: null,
       is_trial: false,
       trial_end_date: null,
+      status: "active",
     });
   });
 
@@ -139,7 +140,7 @@ describe("seasonal plans", () => {
   };
 
   it("accepts a season that wraps the year end (Oct-Jun)", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...seasonal,
       season_start_month: "10",
       season_end_month: "6",
@@ -198,7 +199,7 @@ describe("seasonal plans", () => {
   });
 
   it("clears season months on monthly and yearly plans", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...valid,
       billing_cycle: "yearly",
       season_start_month: "10",
@@ -220,14 +221,14 @@ describe("free trials", () => {
   };
 
   it("uses the trial end date as the first billing date", () => {
-    const result = newSubscriptionSchema.parse(trial);
+    const result = subscriptionSchema.parse(trial);
     expect(result.is_trial).toBe(true);
     expect(result.trial_end_date).toBe("2026-12-10");
     expect(result.next_billing_date).toBe("2026-12-10");
   });
 
   it("ignores a leftover next billing date on a trial", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...trial,
       next_billing_date: "2027-03-01",
     });
@@ -260,7 +261,7 @@ describe("free trials", () => {
   });
 
   it("is off unless the box is checked, and then drops the end date", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...valid,
       trial_end_date: "2026-12-10",
     });
@@ -276,7 +277,7 @@ describe("free trials", () => {
   });
 
   it("works with seasonal plans", () => {
-    const result = newSubscriptionSchema.parse({
+    const result = subscriptionSchema.parse({
       ...trial,
       name: "NBA League Pass",
       category: "sports",
@@ -289,6 +290,29 @@ describe("free trials", () => {
       next_billing_date: "2026-12-10",
       season_start_month: 10,
       season_end_month: 6,
+    });
+  });
+});
+
+describe("status", () => {
+  it("defaults to active when the form doesn't send one (add form)", () => {
+    expect(subscriptionSchema.parse(valid).status).toBe("active");
+    expect(subscriptionSchema.parse({ ...valid, status: "" }).status).toBe(
+      "active",
+    );
+  });
+
+  it("accepts paused and cancelled", () => {
+    for (const status of ["active", "paused", "cancelled"]) {
+      expect(subscriptionSchema.parse({ ...valid, status }).status).toBe(
+        status,
+      );
+    }
+  });
+
+  it("rejects anything else", () => {
+    expect(errorsFor({ ...valid, status: "deleted" })).toEqual({
+      status: ["Choose a status."],
     });
   });
 });
