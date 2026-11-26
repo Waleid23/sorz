@@ -136,3 +136,17 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Seed data, then `toMonthly` / `toYearly` with Vitest tests.
+
+## 2026-11-26: Seed data (week 3 of 5)
+
+**Done**
+- Added `supabase/seed.sql`: Person 1 (Hulu, Netflix, seasonal NBA League Pass, DashPass, Crunchyroll shared with two friends) and Person 2 (yearly Prime, a Game Pass trial ending in 2 days, three Twitch subs with labels, iCloud+, Spotify). 12 subscriptions, one shared plan, two members, two profiles.
+- Created test users `person1@sorz.test` and `person2@sorz.test` in Supabase Auth and ran the seed in the SQL Editor; 12 rows show in `subscriptions`.
+- Tested in PGlite first: clear error if the test users are missing, re-running gives the same 12 rows, and another user's data is untouched.
+
+**Decisions**
+- There's one Supabase project (no local database), so the seed targets two dedicated test accounts and only ever deletes their rows. Deleting those users removes all seed data.
+- Dates are relative to `current_date` so renewals always look upcoming; the seasonal plan bills on the next Oct 1.
+
+**Next**
+- `toMonthly` / `toYearly` with Vitest tests.
