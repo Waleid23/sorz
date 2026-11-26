@@ -94,7 +94,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Write a cost-normalization helper (`toMonthly`, `toYearly`) plus unit tests (Vitest), including seasonal cases
 
 ### Week 7: Accounts and adding subscriptions
-- [ ] Sign up, log in, log out (email + password or magic link)
+- [x] Sign up, log in, log out (email + password or magic link)
 - [ ] Protect routes with middleware; send logged-out users to login
 - [ ] Create a profile row when a user signs up
 - [ ] "Add subscription" form: name, price, cycle, next billing date, category

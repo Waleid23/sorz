@@ -167,3 +167,23 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Week 7 list: sign up / log in / log out, then protect routes.
+
+## 2026-11-26: Sign up, log in, log out (week 3 of 5)
+
+**Done**
+- `/login` and `/signup` pages in a `(auth)` route group (centered card, no bottom nav). Inputs are 48px tall with 16px text so iOS Safari doesn't zoom; email keyboard and password-manager autocomplete hints.
+- Server Actions in `src/lib/auth/actions.ts`: `logIn` (`signInWithPassword`), `signUp` (with `emailRedirectTo` = this site's `/auth/confirm`), `logOut`. Forms use `useActionState` for errors and a pending button.
+- `src/lib/auth/messages.ts`: form validation (valid email, 8+ character password on sign-up) and Supabase error codes mapped to short messages; raw errors never reach the UI. 6 new tests (22 total).
+- `/auth/confirm` route exchanges the email link's code for a session; on failure it sends you to `/login?confirm=failed`, which explains what happened.
+- Settings has an Account section (inside `<Suspense>`, since it reads the session cookie) showing the logged-in email and a Log out button.
+- Supabase: Site URL set to the Vercel URL; `http://localhost:3000/**` and `https://sorz-eight.vercel.app/**` added to Redirect URLs.
+- Tested: Playwright at 375px (wrong password error against the real project, sign-up validation, page links, bad confirmation code, Settings when logged out); logged in and out by hand as `person1@sorz.test`.
+
+**Decisions**
+- Email + password only for now; a magic-link option could come during polish.
+- Sign-up with "Confirm email" on shows a "check your inbox" message instead of logging straight in.
+- Not yet tested end to end: a brand-new sign-up through a real confirmation email (Supabase's built-in email is limited to a few per hour).
+
+**Next**
+- Protect routes: redirect logged-out users to `/login` in the proxy.
+- Create a profile row when a user signs up.
