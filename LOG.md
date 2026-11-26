@@ -118,3 +118,21 @@ Week 2 is done. The goal was to get the project set up, and it is.
 **Next**
 - Apply the migration in the Supabase dashboard (SQL Editor).
 - Phone app shell, seed data, and `toMonthly` / `toYearly` with Vitest tests.
+
+## 2026-11-26: Phone app shell (week 3 of 5)
+
+**Done**
+- Moved the tab pages into a `src/app/(app)/` route group with its own layout, so the login page (week 7) can live outside it without the nav.
+- `BottomNav` (client component): Home, Subs, Calendar, Shared, Settings with inline SVG icons; the active tab is highlighted and gets `aria-current="page"`. Each tab is 75×56px at 375px wide (target ≥ 44px).
+- `PageHeader` (sticky title bar) and a `Placeholder` body; placeholder pages at `/`, `/subs`, `/calendar`, `/shared`, `/settings`.
+- Root layout: `viewport-fit=cover` plus safe-area padding on the header and nav (iPhone notch and home indicator), and a light/dark `theme-color`.
+- Fixed the font: an unlayered `body { font-family: Arial }` in globals.css was overriding Tailwind's `font-sans`, so Geist never loaded.
+- Checked with Playwright emulating a 375px phone in light and dark mode: no horizontal scroll, the right tab is highlighted on every page, tapping between tabs and the back button both work. Lint, typecheck, format check, and build pass.
+
+**Decisions**
+- The nav is wrapped in `<Suspense>`: with `cacheComponents` on, `usePathname` suspends on dynamic routes like a future `/subs/[id]`. The fallback is the same nav with nothing highlighted.
+- Each page renders its own `PageHeader`, so detail pages later can set their own title (and a back button).
+- No icon library; five hand-drawn SVGs aren't worth a dependency.
+
+**Next**
+- Seed data, then `toMonthly` / `toYearly` with Vitest tests.

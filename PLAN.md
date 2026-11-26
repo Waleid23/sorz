@@ -87,7 +87,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Create a Next.js + TypeScript + Tailwind app; set up ESLint and Prettier
 - [x] Create the Supabase project; add env vars to `.env.local` and Vercel
 - [x] Deploy "hello world" to Vercel (deploy on day one)
-- [ ] App shell for phones: header, bottom nav (Home, Subs, Calendar, Shared, Settings), placeholder pages
+- [x] App shell for phones: header, bottom nav (Home, Subs, Calendar, Shared, Settings), placeholder pages
 - [x] Write the database schema as SQL migrations (tables above) and commit them
 - [x] Turn on RLS for every table, with owner-only policies
 - [ ] Add seed data (Person 1's and Person 2's subscriptions) for local testing
