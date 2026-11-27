@@ -103,7 +103,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Subscription list grouped by category, with category icons/colors
 - [x] Edit and delete a subscription; mark it as cancelled or paused
 - [x] "Duplicate" action and an optional label field (multiple Twitch subs)
-- [ ] Quick-add presets for common services (Netflix, Hulu, Crunchyroll, DashPass, Game Pass, iCloud+, Prime, Twitch...)
+- [x] Quick-add presets for common services (Netflix, Hulu, Crunchyroll, DashPass, Game Pass, iCloud+, Prime, Twitch...)
 - [ ] Form validation (zod) and empty and loading states
 
 ### Week 8: Dashboard, calendar, and trials

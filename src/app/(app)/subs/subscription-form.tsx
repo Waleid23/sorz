@@ -4,10 +4,12 @@ import Link from "next/link";
 import {
   startTransition,
   useActionState,
+  useRef,
   useState,
   type FormEvent,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import type { SubscriptionFormState } from "@/lib/subscriptions/actions";
 import type { SubscriptionFormValues } from "@/lib/subscriptions/form-values";
 import {
@@ -16,7 +18,50 @@ import {
   MONTHS,
   STATUSES,
 } from "@/lib/subscriptions/options";
+import { PRESETS, type Preset } from "@/lib/subscriptions/presets";
 import type { SubscriptionField } from "@/lib/subscriptions/schema";
+
+const CATEGORY_ICON = Object.fromEntries(
+  CATEGORIES.map((c) => [c.value, c.icon]),
+);
+
+/** A sideways-scrolling row of common services; tapping one fills in the form. */
+function PresetPicker({
+  chosen,
+  onPick,
+}: {
+  chosen: string | null;
+  onPick: (preset: Preset) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p id="presets-label" className="text-sm font-medium">
+        Quick add
+      </p>
+      <div
+        role="group"
+        aria-labelledby="presets-label"
+        className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden"
+      >
+        {PRESETS.map((preset) => (
+          <button
+            key={preset.name}
+            type="button"
+            aria-pressed={chosen === preset.name}
+            onClick={() => onPick(preset)}
+            className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-zinc-300 px-4 text-sm font-medium whitespace-nowrap hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 aria-pressed:border-indigo-600 aria-pressed:bg-indigo-50 aria-pressed:text-indigo-700 dark:border-zinc-700 dark:hover:bg-zinc-900 dark:aria-pressed:border-indigo-400 dark:aria-pressed:bg-indigo-950/50 dark:aria-pressed:text-indigo-300"
+          >
+            <span aria-hidden="true">{CATEGORY_ICON[preset.category]}</span>
+            {preset.name}
+          </button>
+        ))}
+      </div>
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        Fills in the name, category and billing. You add the price.
+      </p>
+    </div>
+  );
+}
 
 const inputClass =
   "h-12 w-full rounded-xl border border-zinc-300 bg-white px-3 text-base outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900";
@@ -113,13 +158,14 @@ function SegmentedChoice({
 /**
  * The add and edit subscription form. `action` is `saveSubscription` with
  * the subscription id bound (null when adding). The status choice only
- * shows when editing.
+ * shows when editing; quick-add presets only when `showPresets` is set.
  */
 export function SubscriptionForm({
   action,
   initialValues = {},
   submitLabel,
   editing = false,
+  showPresets = false,
 }: {
   action: (
     state: SubscriptionFormState,
@@ -128,6 +174,7 @@ export function SubscriptionForm({
   initialValues?: SubscriptionFormValues;
   submitLabel: string;
   editing?: boolean;
+  showPresets?: boolean;
 }) {
   const [state, formAction, pending] = useActionState<
     SubscriptionFormState,
@@ -140,6 +187,30 @@ export function SubscriptionForm({
   const seasonal = cycle === "seasonal";
   const [trial, setTrial] = useState(values.is_trial === "on");
   const [status, setStatus] = useState<string>(values.status || "active");
+  const [chosenPreset, setChosenPreset] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Name, category and the season months are uncontrolled inputs, so a
+  // preset writes their values directly. flushSync renders the season
+  // pickers first when the preset is seasonal, so they exist to be filled.
+  function applyPreset(preset: Preset) {
+    const form = formRef.current;
+    if (!form) return;
+    const field = (name: SubscriptionField) =>
+      form.elements.namedItem(name) as
+        HTMLInputElement | HTMLSelectElement | null;
+    flushSync(() => {
+      setCycle(preset.billing_cycle);
+      setChosenPreset(preset.name);
+    });
+    field("name")!.value = preset.name;
+    field("category")!.value = preset.category;
+    if (preset.season_start_month && preset.season_end_month) {
+      field("season_start_month")!.value = String(preset.season_start_month);
+      field("season_end_month")!.value = String(preset.season_end_month);
+    }
+    field(preset.askLabel ? "label" : "price")?.focus();
+  }
 
   // React resets a form after its `action` runs, which would snap the
   // controlled billing-cycle radios back to their first value while the
@@ -153,11 +224,16 @@ export function SubscriptionForm({
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       onSubmit={submitWithoutReset}
       className="flex flex-col gap-5"
       noValidate
     >
+      {showPresets && (
+        <PresetPicker chosen={chosenPreset} onPick={applyPreset} />
+      )}
+
       <Field name="name" label="Service" error={errors.name}>
         <input
           id="name"

@@ -40,6 +40,8 @@ async function NewSubscription({
         action={saveSubscription.bind(null, null)}
         initialValues={source ? toDuplicateValues(source) : undefined}
         submitLabel="Save subscription"
+        // Not when duplicating: the form already holds the copied service.
+        showPresets={!source}
       />
     </div>
   );

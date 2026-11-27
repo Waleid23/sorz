@@ -325,3 +325,19 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Quick-add presets for common services, then the zod validation, empty and loading states pass.
+
+## 2026-11-26: Quick-add presets (week 3 of 5)
+
+**Done**
+- Pushed the label/Duplicate commit.
+- "Quick add" row at the top of the add form: 16 chips (Netflix, Hulu, Disney+, YouTube Premium, Crunchyroll, Twitch, Spotify, Apple Music, DashPass, Uber One, Xbox Game Pass, PlayStation Plus, Amazon Prime, iCloud+, Google One, NBA League Pass) in a sideways-scrolling row, each with its category emoji. Chips are 44px tall; the page itself doesn't scroll sideways.
+- Tapping a chip fills in the name, category and billing cycle (NBA League Pass also gets an Oct–Jun season), highlights the chip, and puts the cursor in Price (or Label for Twitch). Not shown on the edit page or when duplicating.
+- Presets live in `src/lib/subscriptions/presets.ts`. 4 new tests (77 total): the services users named are there, names are unique, categories and cycles are valid, each preset passes the form schema once a price and date are added, and only seasonal presets have season months.
+- Tested with Playwright at 375px (light and dark): Netflix, Prime, NBA League Pass, then Spotify (season fields go away), and a Twitch preset saved with a label; values survive a validation error; no presets on edit or duplicate; no console errors. Re-ran the trial, edit and duplicate tests (all pass).
+
+**Decisions**
+- Presets leave the price blank: prices differ by plan (Netflix has several tiers) and change often, and a stale number would quietly make totals wrong. Easy to add typical prices later if wanted.
+- Prime defaults to yearly; it can be switched to monthly in the form.
+
+**Next**
+- Last Week 7 task: the zod validation, empty and loading states check (mostly in place already).
