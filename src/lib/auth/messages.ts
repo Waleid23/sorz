@@ -1,5 +1,9 @@
+import { z } from "zod";
+
 /** Minimum password length, checked before calling Supabase (which requires at least 6). */
 export const MIN_PASSWORD_LENGTH = 8;
+/** Supabase Auth (bcrypt) rejects passwords longer than 72 bytes. */
+export const MAX_PASSWORD_BYTES = 72;
 
 export type AuthFormState = {
   error?: string;
@@ -7,17 +11,25 @@ export type AuthFormState = {
   email?: string;
 };
 
-/** Checks the form fields; returns an error message, or null if they look fine. */
+const signUpSchema = z.object({
+  email: z.email({ error: "Enter a valid email address." }),
+  password: z
+    .string()
+    .min(MIN_PASSWORD_LENGTH, {
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
+    })
+    .refine((p) => new TextEncoder().encode(p).length <= MAX_PASSWORD_BYTES, {
+      error: `Password must be ${MAX_PASSWORD_BYTES} characters or fewer.`,
+    }),
+});
+
+/** Checks the sign-up fields; returns the first error message, or null if they look fine. */
 export function validateCredentials(
   email: string,
   password: string,
 ): string | null {
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return "Enter a valid email address.";
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
-  }
-  return null;
+  const result = signUpSchema.safeParse({ email, password });
+  return result.success ? null : result.error.issues[0].message;
 }
 
 /** Turns a Supabase Auth error into a short message for the form. */

@@ -341,3 +341,22 @@ Week 2 is done. The goal was to get the project set up, and it is.
 
 **Next**
 - Last Week 7 task: the zod validation, empty and loading states check (mostly in place already).
+
+## 2026-11-26: Validation, empty and loading states (week 3 of 5)
+
+**Done**
+- Pushed the presets commit.
+- Audited the task: the subscription forms already validate with zod on the server (add, edit, delete), the Subs list has empty, error and loading states, every data read has a `<Suspense>` skeleton, and every submit button has a pending label. Two gaps found and fixed:
+  - Sign-up validation was hand-written and had no upper password limit, so a password over 72 bytes (Supabase's bcrypt limit) got "Something went wrong." It now uses zod (`z.email()`, 8+ characters, at most 72 bytes) and says "Password must be 72 characters or fewer." 2 new tests (79 total), including emoji passwords (4 bytes each).
+  - On a phone, tapping Save at the bottom of the subscription form could put the error off screen (e.g. on Service at the top), so nothing seemed to happen. After a failed save the form now focuses and scrolls to the first field with a problem.
+- Tested with Playwright at 375×667: a 73-character sign-up password shows the new message (no account created); an empty form saved from the bottom jumps to Service; a form missing only the date jumps to the date. Re-ran the trial, edit, duplicate and presets tests (all pass).
+- That finishes the Week 7 list. Updated CLAUDE.md's status.
+
+**Noticed**
+- A one-off hydration warning in a test run came from Playwright hiding the text cursor for a screenshot before React hydrated (it adds `caret-color: transparent`), not from the app. Screenshots in the tests now use `caret: "initial"`; three clean re-runs.
+
+**Decisions**
+- Error boundaries (`error.tsx`) and the 404 page stay with the Week 9 "error handling and toasts; 404 page" task.
+
+**Next**
+- Week 8 list, starting with the renewal date math (moving past dates forward by cycle, skipping off-season months) and its tests, since the dashboard, calendar and "upcoming" list all depend on it.

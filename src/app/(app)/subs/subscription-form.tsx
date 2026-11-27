@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   startTransition,
   useActionState,
+  useEffect,
   useRef,
   useState,
   type FormEvent,
@@ -189,6 +190,17 @@ export function SubscriptionForm({
   const [status, setStatus] = useState<string>(values.status || "active");
   const [chosenPreset, setChosenPreset] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // After a failed save, jump to the first field with a problem. On a phone
+  // the Save button is at the bottom and the error may be off screen.
+  useEffect(() => {
+    if (!state.errors) return;
+    const firstInvalid = formRef.current?.querySelector<HTMLElement>(
+      '[aria-invalid="true"]',
+    );
+    firstInvalid?.focus({ preventScroll: true });
+    firstInvalid?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [state]);
 
   // Name, category and the season months are uncontrolled inputs, so a
   // preset writes their values directly. flushSync renders the season

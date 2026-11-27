@@ -21,6 +21,17 @@ describe("validateCredentials", () => {
     );
     expect(validateCredentials("person1@sorz.test", "")).toMatch(/at least 8/);
   });
+  it("rejects passwords Supabase can't store (over 72 bytes)", () => {
+    const email = "person1@sorz.test";
+    expect(validateCredentials(email, "x".repeat(72))).toBeNull();
+    expect(validateCredentials(email, "x".repeat(73))).toMatch(/72 characters/);
+    // Emoji take 4 bytes each: 18 fit, 19 don't.
+    expect(validateCredentials(email, "🔑".repeat(18))).toBeNull();
+    expect(validateCredentials(email, "🔑".repeat(19))).toMatch(/72/);
+  });
+  it("reports the email problem first", () => {
+    expect(validateCredentials("nope", "short")).toMatch(/valid email/);
+  });
 });
 
 describe("authErrorMessage", () => {
