@@ -375,3 +375,31 @@ Week 3 is done: 21 of 37 core tasks (about 57%).
 **Next (week 4)**
 - Renewal date math with tests (month-end, leap years, off-season), then the dashboard totals, category chart, "upcoming in 7 days", calendar view, and trials section.
 
+
+## 2026-11-26: Repeatable row-level security test (week 3 of 5)
+
+Feedback asked how row-level security (RLS) on subscriptions is tested. The earlier PGlite check (34 checks, see the schema entry) ran from a temporary folder and was never committed, so it couldn't be re-run or shown. Replaced it with a test that lives in the repo and runs against the real database.
+
+**How the test works** (`scripts/test-rls.mjs`, run with `npm run test:rls`)
+- Logs in as two test users through the same public API the app uses (publishable key, no admin key): A = person1, B = person2, plus a logged-out client. Both logins come from `.env.local`.
+- A and B each create a throwaway subscription named "ZZ RLS check".
+- Control checks: A can read and edit their own row. This makes sure the test can't pass just because nothing works at all.
+- Then B and the logged-out client try to break the rules:
+  - read A's row by its id → gets 0 rows
+  - list all subscriptions → B sees only B's rows (and A only A's)
+  - edit A's row → 0 rows changed; A confirms the price didn't change
+  - change their own row's owner to A → blocked by Postgres (error 42501)
+  - delete A's row → 0 rows deleted; A confirms it still exists
+  - create a row in A's name → blocked (42501)
+  - logged out: read → 0 rows; create → blocked; edit → 0 rows changed
+- Deletes its test rows at the end, even if a check fails, and exits with an error if any check fails.
+
+**Results**
+- All 12 checks pass (person1 sees 6 rows, person2 sees 8, none belonging to the other).
+- To prove it can catch a leak, ran it with "B" set to person1 as well (the same person, so access is allowed): the 5 cross-user checks failed as expected. RLS can't be switched off on the live database to test that way, so this stands in for it.
+
+**Also**
+- Added `TEST_USER2_EMAIL` / `TEST_USER2_PASSWORD` to `.env.local` (gitignored) and blank test-account lines to `.env.example`.
+
+**Next**
+- Week 4 list, starting with renewal date math. When shared plans are built (week 5), extend the RLS test to `shared_plans` and `plan_members`.
