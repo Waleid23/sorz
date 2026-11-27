@@ -1,6 +1,6 @@
 # Sorz — Project Plan
 
-Artifact 5 moonshot · solo · five weeks (Weeks 6–9 for core work, plus stretch time)
+Artifact 5 moonshot · solo · five weeks (week 1 planning, week 2 setup, weeks 3–5 core work, plus stretch time)
 
 ## The idea
 
@@ -63,7 +63,7 @@ People with a lot of subscriptions spread across streaming, gaming, food deliver
 - **Supabase free projects pause after about a week of no activity.** It's a one-click restore, but do it before demos. A scheduled ping can keep the project awake.
 - **Vercel Hobby cron runs at most once a day**, so reminders are checked daily rather than at an exact hour. That's fine for "renews in 3 days" alerts.
 - **Vendor lock-in**: Supabase Auth and RLS are specific to Supabase. The data itself is plain Postgres and easy to export.
-- **Learning curve**: App Router (server vs. client components) and RLS policies are the hardest new concepts. Week 6 covers both early.
+- **Learning curve**: App Router (server vs. client components) and RLS policies are the hardest new concepts. The setup and scaffold work (weeks 2–3) covers both early.
 - **Alternatives considered:**
   - *Firebase*: easy auth, but its NoSQL database makes shared-plan and owed-money queries awkward.
   - *Neon + Prisma + Auth.js*: more control, more setup, and more pieces to connect.
@@ -83,7 +83,7 @@ People with a lot of subscriptions spread across streaming, gaming, food deliver
 
 Each item is meant to be a small, testable piece (roughly one sitting).
 
-### Week 6: Scaffold
+### Weeks 2–3: Setup and scaffold
 - [x] Create a Next.js + TypeScript + Tailwind app; set up ESLint and Prettier
 - [x] Create the Supabase project; add env vars to `.env.local` and Vercel
 - [x] Deploy "hello world" to Vercel (deploy on day one)
@@ -93,7 +93,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Add seed data (Person 1's and Person 2's subscriptions) for local testing
 - [x] Write a cost-normalization helper (`toMonthly`, `toYearly`) plus unit tests (Vitest), including seasonal cases
 
-### Week 7: Accounts and adding subscriptions
+### Week 3: Accounts and adding subscriptions
 - [x] Sign up, log in, log out (email + password or magic link)
 - [x] Protect routes with middleware; send logged-out users to login
 - [x] Create a profile row when a user signs up
@@ -106,7 +106,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [x] Quick-add presets for common services (Netflix, Hulu, Crunchyroll, DashPass, Game Pass, iCloud+, Prime, Twitch...)
 - [x] Form validation (zod) and empty and loading states
 
-### Week 8: Dashboard, calendar, and trials
+### Week 4: Dashboard, calendar, and trials
 - [ ] Dashboard: total per month and per year (normalized)
 - [ ] Spending by category (simple bar or donut chart)
 - [ ] "Upcoming in the next 7 days" list
@@ -116,7 +116,7 @@ Each item is meant to be a small, testable piece (roughly one sitting).
 - [ ] "Convert trial to paid" and "Cancelled before charge" actions
 - [ ] Tests for date math (month-end edge cases like Jan 31 → Feb 28, leap years)
 
-### Week 9: Shared plans, reminders, and polish
+### Week 5: Shared plans, reminders, and polish
 - [ ] Mark a subscription as shared; add members by name
 - [ ] Even split calculated automatically; custom amounts as an option
 - [ ] For each member: paid / owes, and a "mark paid" button

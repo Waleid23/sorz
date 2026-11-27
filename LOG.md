@@ -1,6 +1,6 @@
 # Sorz — Dev Log
 
-Weeks are counted as the five-week moonshot. Week 1 was planning; week 2 was project setup. PLAN.md's "Week 6"–"Week 9" task lists are worked through in order from here, not tied to a specific moonshot week.
+Weeks are counted as the five-week moonshot: week 1 planning, week 2 setup, weeks 3–5 core work. PLAN.md's task lists used to be named "Week 6"–"Week 9"; on 2026-11-26 they were renamed to match. Older entries below still use the old names: Week 6 = Weeks 2–3 (setup and scaffold), Week 7 = Week 3, Week 8 = Week 4, Week 9 = Week 5.
 
 ## 2026-11-14: Planning (week 1 of 5)
 
@@ -359,4 +359,19 @@ Week 2 is done. The goal was to get the project set up, and it is.
 - Error boundaries (`error.tsx`) and the 404 page stay with the Week 9 "error handling and toasts; 404 page" task.
 
 **Next**
-- Week 8 list, starting with the renewal date math (moving past dates forward by cycle, skipping off-season months) and its tests, since the dashboard, calendar and "upcoming" list all depend on it.
+- Week 4 list, starting with the renewal date math (moving past dates forward by cycle, skipping off-season months) and its tests, since the dashboard, calendar and "upcoming" list all depend on it.
+
+## 2026-11-26: Week 3 of 5 wrap-up
+
+**Done this week**
+- Database schema with RLS, seed data, phone app shell, `toMonthly` / `toYearly`.
+- Email + password accounts, route protection, profile on sign-up.
+- Subscriptions: add (presets, monthly / yearly / seasonal, free trial, label), list by category, edit, duplicate, pause / cancel, delete. 79 unit tests.
+- Moved the project out of iCloud to `~/Projects/sorz`.
+- Renamed PLAN.md's task lists to the five-week schedule (Weeks 2–3, 3, 4, 5).
+
+Week 3 is done: 21 of 37 core tasks (about 57%).
+
+**Next (week 4)**
+- Renewal date math with tests (month-end, leap years, off-season), then the dashboard totals, category chart, "upcoming in 7 days", calendar view, and trials section.
+
